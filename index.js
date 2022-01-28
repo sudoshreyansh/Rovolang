@@ -100,10 +100,11 @@ async function handleScoreboardInteraction(interaction) {
         await interaction.deferReply()
         const wargame = interaction.options.get('wargame').value
         const scores = await fetchScoreboard(wargame)
+        const scoreboardName = ( wargame === 'unixit' ? 'UnixIT Scores' : 'OSWAP Scores' )
 
         const embed = new discord.MessageEmbed();
         embed.setColor("0x0099ff")   
-        embed.setTitle('Scores')
+        embed.setTitle(scoreboardName)
 
         for ( const score of scores ) {
             if ( score[wargame] !== 0 ) embed.addField(score.username, score[wargame].toString())

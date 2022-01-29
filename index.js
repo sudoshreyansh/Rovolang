@@ -11,6 +11,18 @@ function logger(...messages) {
     console.log(date, ...messages)
 }
 
+async function checkForConnection() {
+    if (!dbConnection || dbConnection?.connection?._closing) {
+        dbConnection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME
+        })
+        console.log('Database reconnected')
+    }
+}
+
 async function fetchFlag(game, level) {
     const [flag, _] = await dbConnection.query('SELECT * FROM ?? WHERE chall=?', [game, level])
     if ( flag.length > 0 ) return flag[0].flag
@@ -250,6 +262,7 @@ async function setup() {
         for ( let handler in interactionHandlers ) {
             if ( handler === name ) {
                 try {
+                    await checkForConnection()
                     await interactionHandlers[handler](interaction)
                 } catch ( e ) {
                     logger('someone attempted a murder :(')
